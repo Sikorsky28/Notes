@@ -1,8 +1,10 @@
 plugins {
     id 'java'
+    id 'jacoco'
+    id 'checkstyle'
 }
 
-group = 'com.personalnutritionist'
+group = 'ru.mentee.power'
 version = '1.0-SNAPSHOT'
 
 repositories {
@@ -10,10 +12,39 @@ repositories {
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+
+    testImplementation 'org.assertj:assertj-core:3.24.2'
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+// ✅ JUnit 5
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
+
+// ✅ JaCoCo
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = false
+        csv.required = false
+        html.required = true
+    }
+}
+
+// ✅ Checkstyle
+checkstyle {
+    toolVersion = '10.26.1' // или последняя стабильная версия
+    configFile = file("config/checkstyle/google_checks.xml")
+}
+
+// ✅ Добавляем Checkstyle в общую проверку
+check.dependsOn checkstyleMain
